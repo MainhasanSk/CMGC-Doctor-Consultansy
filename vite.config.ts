@@ -18,5 +18,18 @@ export default defineConfig(({ mode }) => {
     define: {
       "process.env": JSON.stringify(env),
     },
+    build: {
+      outDir: "dist",
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ["react", "react-dom", "react-router-dom"],
+            firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+            jspdf: ["jspdf", "jspdf-autotable"],
+          },
+        },
+      },
+    },
   };
 });
