@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { getFriendlyErrorMessage } from "@/lib/errors";
 import { Lock, Mail, Loader2, AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -118,6 +119,15 @@ export default function LoginPage() {
               {loading ? "Authenticating..." : "Sign In"}
             </button>
           </form>
+
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+            <Link
+              href="/"
+              className="text-xs font-semibold text-cmgc-primary hover:text-cmgc-navy transition inline-flex items-center gap-1.5"
+            >
+              &larr; Back to CMGC Home & Medical Consultancy
+            </Link>
+          </div>
         </div>
       </div>
     </div>
