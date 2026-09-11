@@ -1,0 +1,56 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "consultations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "franchiseId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "startDateTime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "consultations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "doctorId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "startDateTime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "consultations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "franchiseId", "order": "ASCENDING" },
+        { "fieldPath": "consultationDate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "consultations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "doctorId", "order": "ASCENDING" },
+        { "fieldPath": "consultationDate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "consultations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "consultationDate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recipientUserId", "order": "ASCENDING" },
+        { "fieldPath": "isRead", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,153 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Safe Helper functions ---
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserDoc() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasUserDoc() {
+      return isAuthenticated() && exists(getUserDoc());
+    }
+
+    function getUserData() {
+      return get(getUserDoc()).data;
+    }
+
+    function isActiveUser() {
+      return hasUserDoc() && getUserData().status == 'ACTIVE';
+    }
+
+    function isAdmin() {
+      return isActiveUser() && getUserData().role == 'ADMIN';
+    }
+
+    function isFranchise() {
+      return isActiveUser() && getUserData().role == 'FRANCHISE';
+    }
+
+    function isDoctor() {
+      return isActiveUser() && getUserData().role == 'DOCTOR';
+    }
+
+    function currentReferenceId() {
+      return getUserData().referenceId;
+    }
+
+    // --- Users collection ---
+    // User can read & create their own profile without throwing runtime errors if not yet an admin.
+    match /users/{uid} {
+      allow read: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow create: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow update: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // --- Franchises collection ---
+    match /franchises/{franchiseId} {
+      allow read: if isAdmin() || (isFranchise() && currentReferenceId() == franchiseId);
+      allow write: if isAdmin();
+    }
+
+    // --- Doctors collection ---
+    match /doctors/{doctorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || (isDoctor() && currentReferenceId() == doctorId);
+    }
+
+    // --- Franchise-Doctor Assignments ---
+    match /franchiseDoctors/{assignmentId} {
+      allow read: if isAdmin() 
+        || (isFranchise() && resource.data.franchiseId == currentReferenceId())
+        || (isDoctor() && resource.data.doctorId == currentReferenceId());
+      allow write: if isAdmin();
+    }
+
+    // --- Patients collection ---
+    match /patients/{patientId} {
+      allow read: if isAdmin() 
+        || (isFranchise() && resource.data.createdByFranchiseId == currentReferenceId())
+        || isDoctor();
+      allow create: if isAdmin() 
+        || (isFranchise() && request.resource.data.createdByFranchiseId == currentReferenceId());
+      allow update: if isAdmin() 
+        || (isFranchise() && resource.data.createdByFranchiseId == currentReferenceId());
+      allow delete: if isAdmin();
+    }
+
+    // --- Consultations collection ---
+    match /consultations/{consultationId} {
+      allow read: if isAdmin() 
+        || (isFranchise() && resource.data.franchiseId == currentReferenceId())
+        || (isDoctor() && resource.data.doctorId == currentReferenceId());
+      
+      allow create: if isAdmin() 
+        || (isFranchise() && request.resource.data.franchiseId == currentReferenceId());
+
+      allow update: if isAdmin()
+        || (isDoctor() && resource.data.doctorId == currentReferenceId())
+        || (isFranchise() && resource.data.franchiseId == currentReferenceId());
+
+      allow delete: if isAdmin();
+    }
+
+    // --- Consultation Reports collection ---
+    match /consultationReports/{reportId} {
+      allow read: if isAdmin()
+        || (isFranchise() && resource.data.franchiseId == currentReferenceId())
+        || isDoctor();
+      allow create: if isAdmin() 
+        || (isFranchise() && request.resource.data.franchiseId == currentReferenceId());
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // --- Prescriptions collection ---
+    match /prescriptions/{prescriptionId} {
+      allow read: if isAdmin()
+        || (isFranchise() && resource.data.franchiseId == currentReferenceId())
+        || (isDoctor() && resource.data.doctorId == currentReferenceId());
+      
+      allow create: if isAdmin() 
+        || (isDoctor() && request.resource.data.doctorId == currentReferenceId());
+
+      // Only draft prescriptions can be edited. Finalized prescriptions are immutable.
+      allow update: if isAdmin()
+        || (isDoctor() && resource.data.doctorId == currentReferenceId() && resource.data.status == 'DRAFT');
+
+      allow delete: if isAdmin();
+    }
+
+    // --- Payments collection ---
+    match /payments/{paymentId} {
+      allow read: if isAdmin() || (isFranchise() && resource.data.franchiseId == currentReferenceId());
+      allow write: if isAdmin();
+    }
+
+    // --- Notifications collection ---
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && resource.data.recipientUserId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.recipientUserId == request.auth.uid;
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated() && resource.data.recipientUserId == request.auth.uid;
+    }
+
+    // --- Settings collection (Pricing, etc.) ---
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- Audit Logs collection ---
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Immutable audit trail
+    }
+  }
+}
