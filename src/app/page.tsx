@@ -28,6 +28,8 @@ import {
   CalendarCheck,
   ChevronRight,
   Headphones,
+  Facebook,
+  Instagram,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -108,13 +110,34 @@ export default function HomePage() {
             <span>Chennai Medical Guidance Centre — Telemedicine & Healthcare Advisory Platform</span>
           </div>
           <div className="flex items-center gap-4 text-slate-300">
-            <a href="tel:+914420001000" className="hover:text-white flex items-center gap-1 transition">
-              <Phone className="h-3 w-3 text-emerald-400" /> +91 44 2000 1000
+            <a href="tel:+919080484704" className="hover:text-white flex items-center gap-1 transition font-medium">
+              <Phone className="h-3 w-3 text-emerald-400" /> +91 90804 84704
             </a>
             <span className="hidden md:inline text-slate-600">|</span>
-            <a href="mailto:info@cmgc.org" className="hover:text-white flex items-center gap-1 transition">
-              <Mail className="h-3 w-3 text-emerald-400" /> info@cmgc.org
+            <a href="mailto:chennaihospital4@gmail.com" className="hover:text-white flex items-center gap-1 transition">
+              <Mail className="h-3 w-3 text-emerald-400" /> chennaihospital4@gmail.com
             </a>
+            <span className="hidden md:inline text-slate-600">|</span>
+            <div className="flex items-center gap-2.5">
+              <a
+                href="https://www.facebook.com/Chennaimedicalguidancecenter?rdid=g92C74Dps0hprmkB&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1C4vZQfZ4r%2F#"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Follow us on Facebook"
+                className="text-slate-300 hover:text-blue-400 transition"
+              >
+                <Facebook className="h-3.5 w-3.5" />
+              </a>
+              <a
+                href="https://www.instagram.com/chennaimedicalguidancecenter?igsh=MW53eGxlODcyeHM2bQ%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Follow us on Instagram"
+                className="text-slate-300 hover:text-pink-400 transition"
+              >
+                <Instagram className="h-3.5 w-3.5" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -556,6 +579,28 @@ export default function HomePage() {
               <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
                 Leading medical consultancy and tele-health infrastructure partner for hospitals, doctors, and franchises across India. Guiding patients with care for over 10 years.
               </p>
+
+              {/* Social Media Links */}
+              <div className="pt-1 flex items-center gap-3">
+                <a
+                  href="https://www.facebook.com/Chennaimedicalguidancecenter?rdid=g92C74Dps0hprmkB&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1C4vZQfZ4r%2F#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-slate-300 hover:bg-blue-600 hover:text-white transition shadow-xs"
+                  title="Follow CMGC on Facebook"
+                >
+                  <Facebook className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://www.instagram.com/chennaimedicalguidancecenter?igsh=MW53eGxlODcyeHM2bQ%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-slate-300 hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-purple-600 hover:text-white transition shadow-xs"
+                  title="Follow CMGC on Instagram"
+                >
+                  <Instagram className="h-4 w-4" />
+                </a>
+              </div>
             </div>
 
             {/* Column 2: Quick Links */}
@@ -580,11 +625,15 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Phone className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>+91 44 2000 1000 / +91 98400 12345</span>
+                  <a href="tel:+919080484704" className="hover:text-white transition font-medium">
+                    +91 90804 84704
+                  </a>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Mail className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>admissions@cmgc.org / support@cmgc.org</span>
+                  <a href="mailto:chennaihospital4@gmail.com" className="hover:text-white transition">
+                    chennaihospital4@gmail.com
+                  </a>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Clock className="h-4 w-4 text-emerald-400 shrink-0" />
