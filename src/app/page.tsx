@@ -566,15 +566,11 @@ export default function HomePage() {
             {/* Column 1: Brand */}
             <div className="md:col-span-5 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1 shadow-sm">
-                  <img src="/logo.png" alt="CMGC Logo" className="h-full w-full object-contain" />
-                </div>
-                <div>
-                  <span className="text-base font-extrabold text-white tracking-tight block">CMGC</span>
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">
-                    Chennai Medical Guidance Centre
-                  </span>
-                </div>
+                <img
+                  src="/logo-footer.png"
+                  alt="CMGC Chennai Medical Guidance Centre"
+                  className="h-14 w-auto max-w-[260px] object-contain rounded-lg"
+                />
               </div>
               <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
                 Leading medical consultancy and tele-health infrastructure partner for hospitals, doctors, and franchises across India. Guiding patients with care for over 10 years.
