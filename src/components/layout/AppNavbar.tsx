@@ -12,8 +12,12 @@ export const AppNavbar: React.FC = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await logout();
-    router.push("/login");
+    try {
+      await logout();
+    } catch (err) {
+      console.warn("Logout error:", err);
+    }
+    window.location.href = "/login";
   };
 
   const getRoleBadge = () => {

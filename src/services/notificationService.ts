@@ -8,7 +8,6 @@ import {
   orderBy,
   limit,
   getDocs,
-  onSnapshot,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/firebase/config";
@@ -104,53 +103,36 @@ export function subscribeToUserNotifications(
   userId: string,
   callback: (notifications: Notification[]) => void
 ): () => void {
-  const fetchLocal = () => {
-    const dbStore = getLocalDb();
-    const list = dbStore.notifications ? Object.values(dbStore.notifications) : [];
-    const notifs = list
-      .filter((n) => n.recipientUserId === userId)
-      .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime())
-      .slice(0, 30);
-    callback(notifs);
+  let isSubscribed = true;
+
+  const fetchAll = async () => {
+    if (!isSubscribed) return;
+    try {
+      const list = await getUserNotifications(userId, 30);
+      if (isSubscribed) {
+        callback(list);
+      }
+    } catch (err) {
+      console.warn("Fetch user notifications error:", err);
+    }
   };
 
+  fetchAll();
+
   const handleCustomChange = () => {
-    fetchLocal();
+    fetchAll();
   };
 
   if (typeof window !== "undefined") {
     window.addEventListener("cmgc-notifications-change", handleCustomChange);
   }
 
-  fetchLocal();
-
-  let unsubscribeFirestore = () => {};
-  try {
-    const q = query(
-      collection(db, "notifications"),
-      where("recipientUserId", "==", userId),
-      orderBy("createdAt", "desc"),
-      limit(30)
-    );
-
-    unsubscribeFirestore = onSnapshot(
-      q,
-      (snapshot) => {
-        if (!snapshot.empty) {
-          const notifs = snapshot.docs.map((doc) => doc.data() as Notification);
-          callback(notifs);
-        }
-      },
-      (error) => {
-        console.warn("Firestore notification listener fallback to local:", error.message);
-      }
-    );
-  } catch (err) {
-    console.warn("Could not attach firestore snapshot:", err);
-  }
+  // Safe background polling every 25 seconds without holding open active watch targets
+  const pollInterval = setInterval(fetchAll, 25000);
 
   return () => {
-    unsubscribeFirestore();
+    isSubscribed = false;
+    clearInterval(pollInterval);
     if (typeof window !== "undefined") {
       window.removeEventListener("cmgc-notifications-change", handleCustomChange);
     }
