@@ -4,8 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { getFriendlyErrorMessage } from "@/lib/errors";
-import { Activity, Lock, Mail, Loader2, AlertCircle, ShieldCheck } from "lucide-react";
-import Link from "next/link";
+import { Lock, Mail, Loader2, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -39,12 +38,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickFill = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setErrorMessage("");
   };
 
   return (
@@ -125,45 +118,6 @@ export default function LoginPage() {
               {loading ? "Authenticating..." : "Sign In"}
             </button>
           </form>
-
-          {/* Quick Setup / Seeder Helper */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                Demo Accounts
-              </span>
-              <Link
-                href="/seed"
-                className="text-[11px] font-semibold text-cmgc-secondary hover:underline flex items-center gap-1"
-              >
-                <ShieldCheck className="h-3 w-3" /> System Initializer
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
-              <button
-                type="button"
-                onClick={() => handleQuickFill("admin@cmgc.org", "Admin@123")}
-                className="rounded-md bg-purple-50 p-1.5 text-purple-700 hover:bg-purple-100 font-medium transition"
-              >
-                Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("franchise@cmgc.org", "Franchise@123")}
-                className="rounded-md bg-blue-50 p-1.5 text-blue-700 hover:bg-blue-100 font-medium transition"
-              >
-                Franchise
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("doctor@cmgc.org", "Doctor@123")}
-                className="rounded-md bg-emerald-50 p-1.5 text-emerald-700 hover:bg-emerald-100 font-medium transition"
-              >
-                Doctor
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

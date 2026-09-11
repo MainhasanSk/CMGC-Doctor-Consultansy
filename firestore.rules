@@ -70,40 +70,25 @@ service cloud.firestore {
 
     // --- Patients collection ---
     match /patients/{patientId} {
-      allow read: if isAdmin() 
-        || (isFranchise() && resource.data.createdByFranchiseId == currentReferenceId())
-        || isDoctor();
-      allow create: if isAdmin() 
-        || (isFranchise() && request.resource.data.createdByFranchiseId == currentReferenceId());
-      allow update: if isAdmin() 
-        || (isFranchise() && resource.data.createdByFranchiseId == currentReferenceId());
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
       allow delete: if isAdmin();
     }
 
     // --- Consultations collection ---
     match /consultations/{consultationId} {
-      allow read: if isAdmin() 
-        || (isFranchise() && resource.data.franchiseId == currentReferenceId())
-        || (isDoctor() && resource.data.doctorId == currentReferenceId());
-      
-      allow create: if isAdmin() 
-        || (isFranchise() && request.resource.data.franchiseId == currentReferenceId());
-
-      allow update: if isAdmin()
-        || (isDoctor() && resource.data.doctorId == currentReferenceId())
-        || (isFranchise() && resource.data.franchiseId == currentReferenceId());
-
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
       allow delete: if isAdmin();
     }
 
     // --- Consultation Reports collection ---
     match /consultationReports/{reportId} {
-      allow read: if isAdmin()
-        || (isFranchise() && resource.data.franchiseId == currentReferenceId())
-        || isDoctor();
-      allow create: if isAdmin() 
-        || (isFranchise() && request.resource.data.franchiseId == currentReferenceId());
-      allow update: if isAdmin();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
       allow delete: if isAdmin();
     }
 

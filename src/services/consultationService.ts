@@ -608,103 +608,126 @@ export async function getConsultationById(consultationId: string): Promise<Consu
 export async function getFranchiseConsultations(
   franchiseId: string
 ): Promise<Consultation[]> {
+  const map = new Map<string, Consultation>();
+  const dbStore = getLocalDb();
+
+  // 1. Load from local database
+  if (dbStore.consultations) {
+    for (const c of Object.values(dbStore.consultations)) {
+      if (c && c.consultationId) {
+        if (
+          c.franchiseId === franchiseId ||
+          (franchiseId === "FR-1001" &&
+            (c.franchiseId === "mock-franchise-uid-01" || c.franchiseId === "mock-franchise-uid"))
+        ) {
+          map.set(c.consultationId, c);
+        }
+      }
+    }
+  }
+
+  // 2. Load from Firestore & merge
   try {
     const q = query(
       collection(db, "consultations"),
       where("franchiseId", "==", franchiseId)
     );
     const snap = await getDocs(q);
-    if (!snap.empty) {
-      return snap.docs
-        .map((d) => ({ ...(d.data() as Consultation), consultationId: d.id }))
-        .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime());
+    for (const d of snap.docs) {
+      const data = d.data() as Consultation;
+      const cId = data.consultationId || d.id;
+      const merged = { ...data, consultationId: cId };
+      map.set(cId, merged);
+      if (!dbStore.consultations) dbStore.consultations = {};
+      dbStore.consultations[cId] = merged;
     }
+    saveLocalDb(dbStore);
   } catch (error) {
     console.warn("Get franchise consultations Firestore fallback:", error);
   }
 
-  const dbStore = getLocalDb();
-  if (dbStore.consultations) {
-    let modified = false;
-    // Auto-heal any legacy records saved with UID instead of franchise reference ID
-    for (const c of Object.values(dbStore.consultations)) {
-      if (
-        c.franchiseId === "mock-franchise-uid-01" ||
-        c.franchiseId === "mock-franchise-uid"
-      ) {
-        c.franchiseId = "FR-1001";
-        modified = true;
-      }
-      if (
-        c.doctorId === "mock-doctor-uid-01" ||
-        c.doctorId === "mock-doctor-uid"
-      ) {
-        c.doctorId = "DOC-2001";
-        modified = true;
-      }
-    }
-    if (modified) saveLocalDb(dbStore);
-  }
-
-  const list = dbStore.consultations ? Object.values(dbStore.consultations) : [];
-  return list
-    .filter(
-      (c) =>
-        c.franchiseId === franchiseId ||
-        (franchiseId === "FR-1001" &&
-          (c.franchiseId === "mock-franchise-uid-01" ||
-            c.franchiseId === "mock-franchise-uid"))
-    )
-    .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime());
+  return Array.from(map.values()).sort(
+    (a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime()
+  );
 }
 
 export async function getDoctorConsultations(
   doctorId: string
 ): Promise<Consultation[]> {
+  const map = new Map<string, Consultation>();
+  const dbStore = getLocalDb();
+
+  // 1. Load from local database
+  if (dbStore.consultations) {
+    for (const c of Object.values(dbStore.consultations)) {
+      if (c && c.consultationId) {
+        if (
+          c.doctorId === doctorId ||
+          (doctorId === "DOC-2001" &&
+            (c.doctorId === "mock-doctor-uid-01" || c.doctorId === "mock-doctor-uid"))
+        ) {
+          map.set(c.consultationId, c);
+        }
+      }
+    }
+  }
+
+  // 2. Load from Firestore & merge
   try {
     const q = query(
       collection(db, "consultations"),
       where("doctorId", "==", doctorId)
     );
     const snap = await getDocs(q);
-    if (!snap.empty) {
-      return snap.docs
-        .map((d) => ({ ...(d.data() as Consultation), consultationId: d.id }))
-        .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime());
+    for (const d of snap.docs) {
+      const data = d.data() as Consultation;
+      const cId = data.consultationId || d.id;
+      const merged = { ...data, consultationId: cId };
+      map.set(cId, merged);
+      if (!dbStore.consultations) dbStore.consultations = {};
+      dbStore.consultations[cId] = merged;
     }
+    saveLocalDb(dbStore);
   } catch (error) {
     console.warn("Get doctor consultations Firestore fallback:", error);
   }
 
-  const dbStore = getLocalDb();
-  const list = dbStore.consultations ? Object.values(dbStore.consultations) : [];
-  return list
-    .filter(
-      (c) =>
-        c.doctorId === doctorId ||
-        (doctorId === "DOC-2001" &&
-          (c.doctorId === "mock-doctor-uid-01" || c.doctorId === "mock-doctor-uid"))
-    )
-    .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime());
+  return Array.from(map.values()).sort(
+    (a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime()
+  );
 }
 
 export async function getAllConsultations(limitCount = 200): Promise<Consultation[]> {
+  const map = new Map<string, Consultation>();
+  const dbStore = getLocalDb();
+
+  // 1. Load from local database
+  if (dbStore.consultations) {
+    for (const c of Object.values(dbStore.consultations)) {
+      if (c && c.consultationId) {
+        map.set(c.consultationId, c);
+      }
+    }
+  }
+
+  // 2. Load from Firestore & merge
   try {
     const q = query(collection(db, "consultations"));
     const snap = await getDocs(q);
-    if (!snap.empty) {
-      return snap.docs
-        .map((d) => ({ ...(d.data() as Consultation), consultationId: d.id }))
-        .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime())
-        .slice(0, limitCount);
+    for (const d of snap.docs) {
+      const data = d.data() as Consultation;
+      const cId = data.consultationId || d.id;
+      const merged = { ...data, consultationId: cId };
+      map.set(cId, merged);
+      if (!dbStore.consultations) dbStore.consultations = {};
+      dbStore.consultations[cId] = merged;
     }
+    saveLocalDb(dbStore);
   } catch (error) {
     console.warn("Get all consultations Firestore fallback:", error);
   }
 
-  const dbStore = getLocalDb();
-  const list = dbStore.consultations ? Object.values(dbStore.consultations) : [];
-  return list
+  return Array.from(map.values())
     .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime())
     .slice(0, limitCount);
 }
