@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { getFriendlyErrorMessage } from "@/lib/errors";
 import {
   Award,
   Building2,
@@ -19,8 +17,6 @@ import {
   Mail,
   MapPin,
   Lock,
-  Loader2,
-  AlertCircle,
   ArrowRight,
   ExternalLink,
   Sparkles,
@@ -33,37 +29,13 @@ import {
 } from "lucide-react";
 
 export default function HomePage() {
-  const { user, login, loading: authLoading } = useAuth();
-  const router = useRouter();
-
-  // Login form state
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const { user } = useAuth();
 
   const getDashboardUrl = () => {
     if (user?.role === "ADMIN") return "/admin/dashboard";
     if (user?.role === "FRANCHISE") return "/franchise/dashboard";
     if (user?.role === "DOCTOR") return "/doctor/dashboard";
     return "/login";
-  };
-
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage("");
-    setSubmitting(true);
-
-    try {
-      const profile = await login(email.trim(), password);
-      if (profile.role === "ADMIN") router.push("/admin/dashboard");
-      else if (profile.role === "FRANCHISE") router.push("/franchise/dashboard");
-      else if (profile.role === "DOCTOR") router.push("/doctor/dashboard");
-    } catch (err) {
-      setErrorMessage(getFriendlyErrorMessage(err));
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   const specialties = [
@@ -179,13 +151,13 @@ export default function HomePage() {
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             ) : (
-              <a
-                href="#portal-login"
+              <Link
+                href="/login"
                 className="inline-flex items-center gap-2 rounded-xl bg-cmgc-primary px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-cmgc-navy transition"
               >
                 <Lock className="h-3.5 w-3.5 text-emerald-300" />
                 Sign In to Portal
-              </a>
+              </Link>
             )}
           </div>
         </div>
@@ -241,13 +213,13 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
-                <a
-                  href="#portal-login"
+                <Link
+                  href={user ? getDashboardUrl() : "/login"}
                   className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-6 py-3 text-xs font-extrabold shadow-lg shadow-emerald-500/20 transition inline-flex items-center gap-2"
                 >
                   <Lock className="h-4 w-4" />
                   Access Medical Portal
-                </a>
+                </Link>
                 <a
                   href="#about"
                   className="rounded-xl bg-white/10 hover:bg-white/15 text-white px-6 py-3 text-xs font-bold border border-white/20 transition inline-flex items-center gap-2"
@@ -258,97 +230,80 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Portal Login Box */}
-            <div id="portal-login" className="lg:col-span-5 scroll-mt-24">
-              <div className="rounded-2xl border border-white/20 bg-white/95 text-slate-900 p-6 sm:p-8 shadow-2xl backdrop-blur">
-                <div className="flex items-center gap-3 pb-5 border-b border-slate-200">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1 shadow-sm border border-slate-200 shrink-0">
-                    <img src="/logo.png" alt="CMGC Logo" className="h-full w-full object-contain" />
+            {/* Right Column: Portal Access Gateway Card */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-2xl border border-white/15 bg-white/[0.04] p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-6 overflow-hidden">
+                {/* Ambient glow effects */}
+                <div className="absolute -top-20 -right-20 h-44 w-44 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-20 -left-20 h-44 w-44 rounded-full bg-cmgc-primary/20 blur-3xl pointer-events-none" />
+
+                <div className="relative z-10 flex items-center justify-between pb-4 border-b border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1.5 shadow-md border border-white/20 shrink-0">
+                      <img src="/logo.png" alt="CMGC Logo" className="h-full w-full object-contain" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-white leading-tight">
+                        Healthcare Provider Portal
+                      </h3>
+                      <p className="text-xs text-emerald-400 font-medium mt-0.5">
+                        Telemedicine & Guidance Suite
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-base font-extrabold text-slate-900 leading-tight">
-                      CMGC Provider Portal
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                      Sign in for Doctors, Franchises & Admin
-                    </p>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/30 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Active
+                  </span>
+                </div>
+
+                {/* Gateway Feature Badges */}
+                <div className="relative z-10 space-y-3">
+                  <div className="flex items-start gap-3 rounded-xl bg-white/[0.03] border border-white/10 p-3 hover:bg-white/[0.06] transition">
+                    <div className="h-8 w-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                      <Video className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">HD Telemedicine Consultations</h4>
+                      <p className="text-[11px] text-slate-300 leading-snug">Direct video consultations with board-certified medical specialists.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 rounded-xl bg-white/[0.03] border border-white/10 p-3 hover:bg-white/[0.06] transition">
+                    <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                      <FileCheck className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">Verified Digital Prescriptions</h4>
+                      <p className="text-[11px] text-slate-300 leading-snug">Instant downloadable PDF prescriptions signed by consulting doctors.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 rounded-xl bg-white/[0.03] border border-white/10 p-3 hover:bg-white/[0.06] transition">
+                    <div className="h-8 w-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                      <Building2 className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">200+ Network Hospitals Across India</h4>
+                      <p className="text-[11px] text-slate-300 leading-snug">Bed reservations, surgery planning, and transparent cost estimates.</p>
+                    </div>
                   </div>
                 </div>
 
-                {user ? (
-                  <div className="py-6 space-y-4 text-center">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                      <CheckCircle2 className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500">You are signed in as</p>
-                      <p className="text-sm font-bold text-slate-900">{user.name}</p>
-                      <p className="text-xs text-cmgc-primary font-semibold uppercase mt-0.5">Role: {user.role}</p>
-                    </div>
-                    <Link
-                      href={getDashboardUrl()}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-cmgc-primary px-4 py-3 text-xs font-extrabold text-white shadow-md hover:bg-cmgc-navy transition"
-                    >
-                      Enter {user.role} Dashboard &rarr;
-                    </Link>
-                  </div>
-                ) : (
-                  <form onSubmit={handleLoginSubmit} className="mt-5 space-y-4">
-                    {errorMessage && (
-                      <div className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700 border border-red-200">
-                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" />
-                        <div>{errorMessage}</div>
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Registered Email
-                      </label>
-                      <div className="relative">
-                        <Mail className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 h-4 w-4 text-slate-400" />
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="name@cmgc.org"
-                          className="w-full rounded-lg border border-slate-300 pl-9 pr-3 py-2.5 text-xs focus:border-cmgc-primary focus:ring-1 focus:ring-cmgc-primary focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Lock className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 h-4 w-4 text-slate-400" />
-                        <input
-                          type="password"
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full rounded-lg border border-slate-300 pl-9 pr-3 py-2.5 text-xs focus:border-cmgc-primary focus:ring-1 focus:ring-cmgc-primary focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={submitting || authLoading}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-cmgc-primary px-4 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-cmgc-navy transition disabled:opacity-50"
-                    >
-                      {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                      {submitting ? "Signing In..." : "Sign In to Dashboard"}
-                    </button>
-
-                    <p className="text-[11px] text-center text-slate-400 pt-2">
-                      Authorized medical personnel, operators, and administrators only.
-                    </p>
-                  </form>
-                )}
+                {/* Action button redirecting to /login */}
+                <div className="relative z-10 pt-1">
+                  <Link
+                    href={user ? getDashboardUrl() : "/login"}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-5 py-3 text-xs font-black shadow-lg shadow-emerald-500/25 transition group"
+                  >
+                    <Lock className="h-4 w-4" />
+                    <span>{user ? `Go to ${user.role} Dashboard` : "Sign In to Medical Portal"}</span>
+                    <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <p className="text-[11px] text-center text-slate-400 mt-2.5">
+                    Authorized access for Doctors, Franchises & Administrators
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -607,7 +562,7 @@ export default function HomePage() {
                 <li><a href="#numbers" className="hover:text-white transition">Our Clinical Network</a></li>
                 <li><a href="#specialties" className="hover:text-white transition">Departments & Specialties</a></li>
                 <li><a href="#how-it-works" className="hover:text-white transition">Franchise Telemedicine</a></li>
-                <li><a href="#portal-login" className="hover:text-white transition">Authorized Portal Login</a></li>
+                <li><Link href={user ? getDashboardUrl() : "/login"} className="hover:text-white transition">Authorized Portal Login</Link></li>
               </ul>
             </div>
 
